@@ -1,0 +1,202 @@
+// Delimiter.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <string>
+#include <iostream>
+#include <ostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <stack>
+
+using namespace std;
+using std::cout;
+using std::cin;
+
+/*
+Converts strings to ints. Made it because 
+none of the premade convertors were working.
+*/
+
+int stringToIntConvertor(string word)
+{
+	int numb = 0;
+	for (int x = 0; x < 4; x++)
+	{
+		if (word.at(x) == '1')
+			numb += (1 * (int)pow(10, (3 - x)));
+		if (word.at(x) == '2')
+			numb += (2 * (int)pow(10, (3 - x)));
+		if (word.at(x) == '3')
+			numb += (3 * (int)pow(10, (3 - x)));
+		if (word.at(x) == '4')
+			numb += (4 * (int)pow(10, (3 - x)));
+		if (word.at(x) == '5')
+			numb += (5 * (int)pow(10, (3 - x)));
+		if (word.at(x) == '6')
+			numb += (6 * (int)pow(10, (3 - x)));
+		if (word.at(x) == '7')
+			numb += (7 * (int)pow(10, (3 - x)));
+		if (word.at(x) == '8')
+			numb += (8 * (int)pow(10, (3 - x)));
+		if (word.at(x) == '9')
+			numb += (9 * (int)pow(10, (3 - x)));
+	}
+	return numb;
+}
+
+/*
+This method gets the hash number,
+using charats and string types.
+*/
+
+string hashNumber (string word)
+{
+	string hashWord, third, fifth, seventh, eight;
+
+	cout << word << "\n";
+	//system("pause");
+	third = word.at(2);
+	cout << third << "\n";
+	fifth = word.at(4);
+	cout << fifth << "\n";
+	seventh = word.at(6);
+	cout << seventh << "\n";
+	eight = word.at(7);
+	cout << eight << "\n";
+	//system("pause");
+	third = third.append(fifth);
+	seventh = seventh.append(eight);
+	third = third.append(seventh);
+	cout << third << "\n";
+	//system("pause");
+	hashWord = third;
+
+	return (hashWord);
+}
+
+//Quadratic Probing (Hash(Key) + i^2)%Max)
+/*
+Method to probe through an array,
+and place the numbers where they
+should go. Doesn't do a replacement
+sort.
+*/
+
+
+int quadProbe(string word, int address, int quadNumb, int count)
+{
+	cout << "In Quad Probe" << "\n";
+	address = ((address + quadNumb ^ 2) % count);
+	if (address > count)
+	{
+		address = address % 100;
+	}
+	return address;
+}
+
+/*
+One thing to note this one dimensional array stuff,
+only works for a list list with a max of 10,000 
+numbers, I made my own with 10,000 and it worked.
+I had a count for the given data and it was 65000,
+way more than 10000, so it didn't work, but my method
+does work for things that are 10,000 at max. Note to 
+self this code takes a long while to run, but it runs.
+*/
+
+void _tmain()
+{
+	ifstream inFile;
+	ofstream outFile;
+	string word, hashNumb, stringAddress, fileName;
+	int count = 0, quadNumb, intAddress;
+	stack<string> numbStack;
+
+	/*
+	This file name thing rarely works, so
+	it's a lot bettter just put it into 
+	inFile directly. That's why its commented out
+	*/
+
+	//cout << "What is the name of the file?" << "\n";
+	//cin >> fileName;
+	//inFile.open(fileName);
+
+	inFile.open("C:\\Users\\ES Shiro\\Desktop\\everybodys_socials.txt");
+	outFile.open("hashed_socials.txt");
+
+	int const max = 10000;
+	string numbsArray[max];
+	
+	for (int x = 0; x < max; x++)
+	{
+		numbsArray[x] = "NULL";
+		//cout << numbsArray[x] << "\n";
+	}
+	//*/
+	system("pause");
+
+	while (!inFile.eof())                          
+	{
+		if (getline(inFile, word, ','))    
+		{
+			numbStack.push(word);
+			count++;
+		}
+	}
+
+	/*
+	Make sure count 2 is working for
+	data more than 10,000
+	*/
+
+	cout << "Data size " << count << "\n";
+	system("pause");
+	
+	inFile.close();
+
+	cout << "please choose a number between 1 - 45000000" << "\n";
+	cin >> quadNumb;
+
+	/*
+	This for loop gets the hash address,
+	and places the numbers in the correct
+	location within an array of string .
+	*/
+
+	for (int x=0; x < count; x++)
+	{
+		word = numbStack.top();
+		cout << word << "\n";
+		//system("pause");
+		stringAddress = hashNumber(word);
+		intAddress = stringToIntConvertor(stringAddress);
+		while(numbsArray[intAddress]!="NULL")
+		{ 
+			intAddress = quadProbe(word, intAddress, quadNumb, max);
+		}
+		cout << "putting word int array" << "\n";
+		numbsArray[intAddress] = word;
+		numbStack.pop();
+	}
+	system("pause");
+	//*/
+
+	/*
+	Writes the numbers into the out file
+	and writes it out so you see whats 
+	being written
+	*/
+
+	for (int x = 0; x < count-1; x++ )
+	{
+		outFile << numbsArray[x] << ',';
+		cout << numbsArray[x] << "\n";
+	}
+	outFile << numbsArray[count - 1];
+	cout << numbsArray[count - 1];
+	outFile.close();
+	system("pause");
+}
